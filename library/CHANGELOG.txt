@@ -1,0 +1,10 @@
+0.0.2
+-----
+
+* Added `get_altitude` method
+* Corrected pressure to hPa
+
+0.0.1
+-----
+
+* Initial Release
