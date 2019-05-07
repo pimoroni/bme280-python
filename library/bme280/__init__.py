@@ -9,6 +9,15 @@ I2C_ADDRESS_GND = 0x76
 I2C_ADDRESS_VCC = 0x77
 
 
+class S8Adapter(Adapter):
+    """Convert unsigned 8bit integer to signed."""
+
+    def _decode(self, value):
+        if value & (1 << 7):
+            value -= 1 << 8
+        return value
+
+
 class S16Adapter(Adapter):
     """Convert unsigned 16bit integer to signed."""
 
@@ -21,6 +30,24 @@ class U16Adapter(Adapter):
 
     def _decode(self, value):
         return struct.unpack('<H', _int_to_bytes(value, 2))[0]
+
+
+class H5Adapter(S16Adapter):
+    def _decode(self, value):
+        b = _int_to_bytes(value, 2)
+        r = ((b[0] >> 4) & 0x0F) | (b[1] << 4)
+        if r & (1 << 11):
+            r = r - 1 << 12
+        return r
+
+
+class H4Adapter(S16Adapter):
+    def _decode(self, value):
+        b = _int_to_bytes(value, 2)
+        r = (b[0] << 4) | (b[1] & 0x0F)
+        if r & (1 << 11):
+            r = r - 1 << 12
+        return r
 
 
 class BME280Calibration():
@@ -38,6 +65,13 @@ class BME280Calibration():
         self.dig_p7 = 0
         self.dig_p8 = 0
         self.dig_p9 = 0
+
+        self.dig_h1 = 0
+        self.dig_h2 = 0
+        self.dig_h3 = 0
+        self.dig_h4 = 0
+        self.dig_h5 = 0
+        self.dig_h6 = 0                
 
         self.temperature_fine = 0
 
@@ -60,6 +94,12 @@ class BME280Calibration():
         var1 = self.dig_p9 * pressure * pressure / 2147483648.0
         var2 = pressure * self.dig_p8 / 32768.0
         return pressure + (var1 + var2 + self.dig_p7) / 16.0
+
+    def compensate_humidity(self, raw_humidity):
+        humidity = self.temperature_fine - 76800.0
+        humidity = (raw_humidity - (self.dig_h4 * 64.0 + self.dig_h5 / 16384.0 * humidity)) * (self.dig_h2 / 65536.0 * (1.0 + self.dig_h6 / 67108864.0 * humidity * (1.0 + self.dig_h3 / 67108864.0 * humidity)))
+        humidity = humidity * (1.0 - self.dig_h1 * humidity / 524288.0)
+        return max(0.0, min(100.0, humidity))
 
 
 class BME280:
@@ -110,29 +150,38 @@ class BME280:
                              250: 0b011,
                              500: 0b100,
                              1000: 0b101,
-                             2000: 0b110,
-                             4000: 0b111})),
+                             10: 0b110,
+                             20: 0b111})),
                 BitField('filter', 0b00011100),                   # Controls the time constant of the IIR filter
                 BitField('spi3w_en', 0b0000001, read_only=True),  # Enable 3-wire SPI interface when set to 1. IE: Don't set this bit!
             )),
             Register('DATA', 0xF7, fields=(
-                BitField('temperature', 0x000000FFFFF0),
-                BitField('pressure', 0xFFFFF0000000),
-            ), bit_width=48),
+                BitField('humidity', 0x000000000000FFFF),
+                BitField('temperature', 0x000000FFFFF00000),
+                BitField('pressure', 0xFFFFF00000000000)
+            ), bit_width=8 * 8),
             Register('CALIBRATION', 0x88, fields=(
-                BitField('dig_t1', 0xFFFF << 16 * 11, adapter=U16Adapter()),   # 0x88 0x89
-                BitField('dig_t2', 0xFFFF << 16 * 10, adapter=S16Adapter()),   # 0x8A 0x8B
-                BitField('dig_t3', 0xFFFF << 16 * 9, adapter=S16Adapter()),    # 0x8C 0x8D
-                BitField('dig_p1', 0xFFFF << 16 * 8, adapter=U16Adapter()),    # 0x8E 0x8F
-                BitField('dig_p2', 0xFFFF << 16 * 7, adapter=S16Adapter()),    # 0x90 0x91
-                BitField('dig_p3', 0xFFFF << 16 * 6, adapter=S16Adapter()),    # 0x92 0x93
-                BitField('dig_p4', 0xFFFF << 16 * 5, adapter=S16Adapter()),    # 0x94 0x95
-                BitField('dig_p5', 0xFFFF << 16 * 4, adapter=S16Adapter()),    # 0x96 0x97
-                BitField('dig_p6', 0xFFFF << 16 * 3, adapter=S16Adapter()),    # 0x98 0x99
-                BitField('dig_p7', 0xFFFF << 16 * 2, adapter=S16Adapter()),    # 0x9A 0x9B
-                BitField('dig_p8', 0xFFFF << 16 * 1, adapter=S16Adapter()),    # 0x9C 0x9D
-                BitField('dig_p9', 0xFFFF << 16 * 0, adapter=S16Adapter()),    # 0x9E 0x9F
-            ), bit_width=192)
+                BitField('dig_t1', 0xFFFF << 16 * 12, adapter=U16Adapter()),  # 0x88 0x89
+                BitField('dig_t2', 0xFFFF << 16 * 11, adapter=S16Adapter()),  # 0x8A 0x8B
+                BitField('dig_t3', 0xFFFF << 16 * 10, adapter=S16Adapter()),  # 0x8C 0x8D
+                BitField('dig_p1', 0xFFFF << 16 * 9, adapter=U16Adapter()),   # 0x8E 0x8F
+                BitField('dig_p2', 0xFFFF << 16 * 8, adapter=S16Adapter()),   # 0x90 0x91
+                BitField('dig_p3', 0xFFFF << 16 * 7, adapter=S16Adapter()),   # 0x92 0x93
+                BitField('dig_p4', 0xFFFF << 16 * 6, adapter=S16Adapter()),   # 0x94 0x95
+                BitField('dig_p5', 0xFFFF << 16 * 5, adapter=S16Adapter()),   # 0x96 0x97
+                BitField('dig_p6', 0xFFFF << 16 * 4, adapter=S16Adapter()),   # 0x98 0x99
+                BitField('dig_p7', 0xFFFF << 16 * 3, adapter=S16Adapter()),   # 0x9A 0x9B
+                BitField('dig_p8', 0xFFFF << 16 * 2, adapter=S16Adapter()),   # 0x9C 0x9D
+                BitField('dig_p9', 0xFFFF << 16 * 1, adapter=S16Adapter()),   # 0x9E 0x9F
+                BitField('dig_h1', 0x00FF),                                   # 0xA1 uint8
+            ), bit_width=26 * 8),
+            Register('CALIBRATION2', 0xE1, fields=(
+                BitField('dig_h2', 0xFFFF0000000000, adapter=S16Adapter()),   # 0xE1 0xE2
+                BitField('dig_h3', 0x0000FF00000000),                         # 0xE3 uint8
+                BitField('dig_h4', 0x000000FFFF0000, adapter=H4Adapter()),    # 0xE4 0xE5[3:0]
+                BitField('dig_h5', 0x00000000FFFF00, adapter=H5Adapter()),    # 0xE5[7:4] 0xE6
+                BitField('dig_h6', 0x000000000000FF, adapter=S8Adapter())     # 0xE7 int8
+            ), bit_width=7 * 8)
         ))
 
     def setup(self, mode='normal', temperature_oversampling=16, pressure_oversampling=16, temperature_standby=500):
@@ -178,6 +227,15 @@ class BME280:
             self.calibration.dig_p8 = CALIBRATION.get_dig_p8()
             self.calibration.dig_p9 = CALIBRATION.get_dig_p9()
 
+            self.calibration.dig_h1 = CALIBRATION.get_dig_h1()
+
+        with self._bme280.CALIBRATION2 as CALIBRATION:
+            self.calibration.dig_h2 = CALIBRATION.get_dig_h2()
+            self.calibration.dig_h3 = CALIBRATION.get_dig_h3()
+            self.calibration.dig_h4 = CALIBRATION.get_dig_h4()
+            self.calibration.dig_h5 = CALIBRATION.get_dig_h5()
+            self.calibration.dig_h6 = CALIBRATION.get_dig_h6()
+
     def update_sensor(self):
         self.setup()
 
@@ -187,11 +245,14 @@ class BME280:
             while self._bme280.STATUS.get_measuring():
                 time.sleep(0.001)
 
-        raw_temperature = self._bme280.DATA.get_temperature()
-        raw_pressure = self._bme280.DATA.get_pressure()
+        with self._bme280.DATA as DATA:
+            raw_temperature = DATA.get_temperature()
+            raw_pressure = DATA.get_pressure()
+            raw_humidity = DATA.get_humidity()
 
         self.temperature = self.calibration.compensate_temperature(raw_temperature)
         self.pressure = self.calibration.compensate_pressure(raw_pressure) / 100.0
+        self.humidity = self.calibration.compensate_humidity(raw_humidity)
 
     def get_temperature(self):
         self.update_sensor()
@@ -200,6 +261,10 @@ class BME280:
     def get_pressure(self):
         self.update_sensor()
         return self.pressure
+
+    def get_humidity(self):
+        self.update_sensor()
+        return self.humidity
 
     def get_altitude(self, qnh=1013.25):
         self.update_sensor()
