@@ -135,12 +135,21 @@ class BME280:
                              4: 0b011,
                              8: 0b100,
                              16: 0b101})),
-                BitField('mode', 0b00000011,     # Power mode
+               BitField('mode', 0b00000011,     # Power mode
                          adapter=LookupAdapter({
                              'sleep': 0b00,
                              'forced': 0b10,
                              'normal': 0b11})),
             )),
+            Register('CTRL_HUM', 0xF2, fields=(
+                BitField('osrs_h', 0b00000111,   # Humidity oversampling
+                         adapter=LookupAdapter({
+                             1: 0b001,
+                             2: 0b010,
+                             4: 0b011,
+                             8: 0b100,
+                             16: 0b101})),
+            )), 
             Register('CONFIG', 0xF5, fields=(
                 BitField('t_sb', 0b11100000,     # Temp standby duration in normal mode
                          adapter=LookupAdapter({
@@ -184,7 +193,7 @@ class BME280:
             ), bit_width=7 * 8)
         ))
 
-    def setup(self, mode='normal', temperature_oversampling=16, pressure_oversampling=16, temperature_standby=500):
+    def setup(self, mode='normal', temperature_oversampling=16, pressure_oversampling=16, humidity_oversampling=16, temperature_standby=500):
         if self._is_setup:
             return
         self._is_setup = True
@@ -206,6 +215,8 @@ class BME280:
             CTRL_MEAS.set_osrs_t(temperature_oversampling)
             CTRL_MEAS.set_osrs_p(pressure_oversampling)
             CTRL_MEAS.write()
+
+        self._bme280.CTRL_HUM.set_osrs_h(humidity_oversampling)
 
         with self._bme280.CONFIG as CONFIG:
             CONFIG.set_t_sb(temperature_standby)
