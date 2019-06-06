@@ -210,13 +210,16 @@ class BME280:
         except IOError:
             raise RuntimeError("Unable to find bme280 on 0x{:02x}, IOError".format(self._i2c_addr))
 
+        self._bme280.RESET.set_reset(0xB6)
+        time.sleep(0.1)
+
+        self._bme280.CTRL_HUM.set_osrs_h(humidity_oversampling)
+
         with self._bme280.CTRL_MEAS as CTRL_MEAS:
             CTRL_MEAS.set_mode(mode)
             CTRL_MEAS.set_osrs_t(temperature_oversampling)
             CTRL_MEAS.set_osrs_p(pressure_oversampling)
             CTRL_MEAS.write()
-
-        self._bme280.CTRL_HUM.set_osrs_h(humidity_oversampling)
 
         with self._bme280.CONFIG as CONFIG:
             CONFIG.set_t_sb(temperature_standby)
