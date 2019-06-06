@@ -71,7 +71,7 @@ class BME280Calibration():
         self.dig_h3 = 0
         self.dig_h4 = 0
         self.dig_h5 = 0
-        self.dig_h6 = 0                
+        self.dig_h6 = 0
 
         self.temperature_fine = 0
 
@@ -135,7 +135,7 @@ class BME280:
                              4: 0b011,
                              8: 0b100,
                              16: 0b101})),
-               BitField('mode', 0b00000011,     # Power mode
+                BitField('mode', 0b00000011,     # Power mode
                          adapter=LookupAdapter({
                              'sleep': 0b00,
                              'forced': 0b10,
@@ -149,7 +149,7 @@ class BME280:
                              4: 0b011,
                              8: 0b100,
                              16: 0b101})),
-            )), 
+            )),
             Register('CONFIG', 0xF5, fields=(
                 BitField('t_sb', 0b11100000,     # Temp standby duration in normal mode
                          adapter=LookupAdapter({

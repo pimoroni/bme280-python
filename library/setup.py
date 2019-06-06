@@ -38,7 +38,7 @@ classifiers = ['Development Status :: 4 - Beta',
                'Topic :: System :: Hardware']
 
 setup(
-    name='bme280',
+    name='pimoroni-bme280',
     version='0.0.1',
     author='Philip Howard',
     author_email='phil@pimoroni.com',
