@@ -11,7 +11,7 @@ Installing
 
 Stable library from PyPi:
 
--  Just run ``sudo pip install bme280``
+-  Just run ``sudo pip install pimoroni-bme280``
 
 Latest/development library from GitHub:
 
@@ -23,7 +23,7 @@ Latest/development library from GitHub:
    :target: https://travis-ci.com/pimoroni/bme280-python
 .. |Coverage Status| image:: https://coveralls.io/repos/github/pimoroni/bme280-python/badge.svg?branch=master
    :target: https://coveralls.io/github/pimoroni/bme280-python?branch=master
-.. |PyPi Package| image:: https://img.shields.io/pypi/v/bme280.svg
-   :target: https://pypi.python.org/pypi/bme280
-.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/bme280.svg
-   :target: https://pypi.python.org/pypi/bme280
+.. |PyPi Package| image:: https://img.shields.io/pypi/v/pimoroni-bme280.svg
+   :target: https://pypi.python.org/pypi/pimoroni-bme280
+.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/pimoroni-bme280.svg
+   :target: https://pypi.python.org/pypi/pimoroni-bme280
