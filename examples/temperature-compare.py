@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import time
 try:
     from smbus2 import SMBus
@@ -5,9 +7,16 @@ except ImportError:
     from smbus import SMBus
 from bme280 import BME280
 
+print("""temperature-compare.py - Compares oversampling levels
+(requires two BME280s with different addresses).
 
+Press Ctrl+C to exit!
+
+""")
+
+# Initialise the BME280
 bus = SMBus(1)
-bme280A = BME280(i2c_dev=bus) #, i2c_addr=0x77)
+bme280A = BME280(i2c_dev=bus)
 bme280B = BME280(i2c_dev=bus, i2c_addr=0x77)
 
 # Set up in "forced" mode

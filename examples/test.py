@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import time
 from bme280 import _bme280, CHIP_ID
 
