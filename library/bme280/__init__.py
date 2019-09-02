@@ -75,6 +75,12 @@ class BME280Calibration():
 
         self.temperature_fine = 0
 
+    def set_from_tuple(self, value):
+        # Iterate through a tuple supplied by i2cdevice
+        # and copy its values into the class attributes
+        for key in value._asdict().keys():
+            setattr(self, key, value.asdict()[key])
+
     def compensate_temperature(self, raw_temperature):
         var1 = (raw_temperature / 16384.0 - self.dig_t1 / 1024.0) * self.dig_t2
         var2 = raw_temperature / 131072.0 - self.dig_t1 / 8192.0
@@ -210,63 +216,36 @@ class BME280:
         except IOError:
             raise RuntimeError("Unable to find bme280 on 0x{:02x}, IOError".format(self._i2c_addr))
 
-        self._bme280.RESET.set_reset(0xB6)
+        self._bme280.set('RESET', reset=0xB6)
         time.sleep(0.1)
 
-        self._bme280.CTRL_HUM.set_osrs_h(humidity_oversampling)
+        self._bme280.set('CTRL_HUM', osrs_h=humidity_oversampling)
 
-        with self._bme280.CTRL_MEAS as CTRL_MEAS:
-            CTRL_MEAS.set_mode(mode)
-            CTRL_MEAS.set_osrs_t(temperature_oversampling)
-            CTRL_MEAS.set_osrs_p(pressure_oversampling)
-            CTRL_MEAS.write()
+        self._bme280.set('CTRL_MEAS',
+                         mode=mode,
+                         osrs_t=temperature_oversampling,
+                         osrs_p=pressure_oversampling)
 
-        with self._bme280.CONFIG as CONFIG:
-            CONFIG.set_t_sb(temperature_standby)
-            CONFIG.set_filter(2)
-            CONFIG.write()
+        self._bme280.set('CONFIG',
+                         t_sb=temperature_standby,
+                         filter=2)
 
-        with self._bme280.CALIBRATION as CALIBRATION:
-            self.calibration.dig_t1 = CALIBRATION.get_dig_t1()
-            self.calibration.dig_t2 = CALIBRATION.get_dig_t2()
-            self.calibration.dig_t3 = CALIBRATION.get_dig_t3()
-
-            self.calibration.dig_p1 = CALIBRATION.get_dig_p1()
-            self.calibration.dig_p2 = CALIBRATION.get_dig_p2()
-            self.calibration.dig_p3 = CALIBRATION.get_dig_p3()
-            self.calibration.dig_p4 = CALIBRATION.get_dig_p4()
-            self.calibration.dig_p5 = CALIBRATION.get_dig_p5()
-            self.calibration.dig_p6 = CALIBRATION.get_dig_p6()
-            self.calibration.dig_p7 = CALIBRATION.get_dig_p7()
-            self.calibration.dig_p8 = CALIBRATION.get_dig_p8()
-            self.calibration.dig_p9 = CALIBRATION.get_dig_p9()
-
-            self.calibration.dig_h1 = CALIBRATION.get_dig_h1()
-
-        with self._bme280.CALIBRATION2 as CALIBRATION:
-            self.calibration.dig_h2 = CALIBRATION.get_dig_h2()
-            self.calibration.dig_h3 = CALIBRATION.get_dig_h3()
-            self.calibration.dig_h4 = CALIBRATION.get_dig_h4()
-            self.calibration.dig_h5 = CALIBRATION.get_dig_h5()
-            self.calibration.dig_h6 = CALIBRATION.get_dig_h6()
+        self.calibration.set_from_namedtuple(self._bme280.get('CALIBRATION'))
+        self.calibration.set_from_namedtuple(self._bme280.get('CALIBRATION2'))
 
     def update_sensor(self):
         self.setup()
 
         if self._mode == "forced":
-            # Trigger a reading in forced mode and wait for result
-            self._bme280.CTRL_MEAS.set_mode("forced")
-            while self._bme280.STATUS.get_measuring():
+            self._bme280.set('CTRL_MEAS', mode="forced")
+            while self._bme280.get('STATUS').measuring:
                 time.sleep(0.001)
 
-        with self._bme280.DATA as DATA:
-            raw_temperature = DATA.get_temperature()
-            raw_pressure = DATA.get_pressure()
-            raw_humidity = DATA.get_humidity()
+        raw = self._bme280.get('DATA')
 
-        self.temperature = self.calibration.compensate_temperature(raw_temperature)
-        self.pressure = self.calibration.compensate_pressure(raw_pressure) / 100.0
-        self.humidity = self.calibration.compensate_humidity(raw_humidity)
+        self.temperature = self.calibration.compensate_temperature(raw.temperature)
+        self.pressure = self.calibration.compensate_pressure(raw.pressure) / 100.0
+        self.humidity = self.calibration.compensate_humidity(raw.humidity)
 
     def get_temperature(self):
         self.update_sensor()
