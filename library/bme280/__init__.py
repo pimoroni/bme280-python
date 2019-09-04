@@ -213,9 +213,8 @@ class BME280:
         if mode == "forced":
             mode = "sleep"
 
-        chip = self._bme280.get('CHIP_ID')
-
         try:
+            chip = self._bme280.get('CHIP_ID')
             if chip.id != CHIP_ID:
                 raise RuntimeError("Unable to find bme280 on 0x{:02x}, CHIP_ID returned {:02x}".format(self._i2c_addr, chip.id))
         except IOError:
