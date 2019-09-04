@@ -75,11 +75,14 @@ class BME280Calibration():
 
         self.temperature_fine = 0
 
-    def set_from_tuple(self, value):
+    def set_from_namedtuple(self, value):
         # Iterate through a tuple supplied by i2cdevice
         # and copy its values into the class attributes
-        for key in value._asdict().keys():
-            setattr(self, key, value.asdict()[key])
+        for key in self.__dict__.keys():
+            try:
+                setattr(self, key, getattr(value, key))
+            except AttributeError:
+                pass
 
     def compensate_temperature(self, raw_temperature):
         var1 = (raw_temperature / 16384.0 - self.dig_t1 / 1024.0) * self.dig_t2
