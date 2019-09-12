@@ -4,6 +4,9 @@ from i2cdevice.adapter import LookupAdapter, Adapter
 import struct
 import time
 
+
+__version__ = '0.0.2'
+
 CHIP_ID = 0x60
 I2C_ADDRESS_GND = 0x76
 I2C_ADDRESS_VCC = 0x77

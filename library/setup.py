@@ -39,7 +39,7 @@ classifiers = ['Development Status :: 4 - Beta',
 
 setup(
     name='pimoroni-bme280',
-    version='0.0.1',
+    version='0.0.3',
     author='Philip Howard',
     author_email='phil@pimoroni.com',
     description="""Python library for the bme280 temperature, pressure and humidity sensor""",
@@ -50,5 +50,5 @@ setup(
     project_urls={'GitHub': 'https://www.github.com/pimoroni/bme680-python'},
     classifiers=classifiers,
     packages=['bme280'],
-    install_requires=['i2cdevice>=0.0.4']
+    install_requires=['i2cdevice>=0.0.6']
 )
