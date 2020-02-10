@@ -7,6 +7,14 @@
 
 Suitable for measuring ambient temperature, barometric pressure, and humidity, the BME280 is a great indoor environmental sensor.
 
+# Pre-requisites
+
+You must enable:
+
+* i2c: `sudo raspi-config nonint do_i2c 0`
+
+You can optionally run `sudo raspi-config` or the graphical Raspberry Pi Configuration UI to enable interfaces.
+
 # Installing
 
 Stable library from PyPi:
