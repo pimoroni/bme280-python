@@ -30,7 +30,7 @@ time.sleep(1)
 
 # workaround to get rid of the first reading
 altitude = bme280.get_altitude()
-print("Waiting a couple of seconds for the sensor to initialise..."
+print("Waiting a couple of seconds for the sensor to initialise...")
 time.sleep(2)
 
 while True:
