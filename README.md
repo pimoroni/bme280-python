@@ -17,9 +17,9 @@ You can optionally run `sudo raspi-config` or the graphical Raspberry Pi Configu
 
 # Installing
 
-Stable library from PyPi:
+Stable library from PyPi, the smbus library is also needed:
 
-* Just run `sudo pip install pimoroni-bme280`
+* Just run `sudo pip install pimoroni-bme280 smbus`
 
 Latest/development library from GitHub:
 
