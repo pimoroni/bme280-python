@@ -69,12 +69,12 @@ class BME280Calibration():
         self.dig_p8 = 0
         self.dig_p9 = 0
 
-        self.dig_h1 = 0
-        self.dig_h2 = 0
-        self.dig_h3 = 0
-        self.dig_h4 = 0
-        self.dig_h5 = 0
-        self.dig_h6 = 0
+        self.dig_h1 = 0.0
+        self.dig_h2 = 0.0
+        self.dig_h3 = 0.0
+        self.dig_h4 = 0.0
+        self.dig_h5 = 0.0
+        self.dig_h6 = 0.0
 
         self.temperature_fine = 0
 
@@ -108,9 +108,15 @@ class BME280Calibration():
         return pressure + (var1 + var2 + self.dig_p7) / 16.0
 
     def compensate_humidity(self, raw_humidity):
-        humidity = self.temperature_fine - 76800.0
-        humidity = (raw_humidity - (self.dig_h4 * 64.0 + self.dig_h5 / 16384.0 * humidity)) * (self.dig_h2 / 65536.0 * (1.0 + self.dig_h6 / 67108864.0 * humidity * (1.0 + self.dig_h3 / 67108864.0 * humidity)))
-        humidity = humidity * (1.0 - self.dig_h1 * humidity / 524288.0)
+        var1 = self.temperature_fine - 76800.0
+        var2 = self.dig_h4 * 64.0 + (self.dig_h5 / 16384.0) * var1
+        var3 = raw_humidity - var2
+        var4 = self.dig_h2 / 65536.0
+        var5 = 1.0 + (self.dig_h3 / 67108864.0) * var1
+        var6 = 1.0 + (self.dig_h6 / 67108864.0) * var1 * var5
+        var6 = var3 * var4 * (var5 * var6)
+
+        humidity = var6 * (1.0 - self.dig_h1 * var6 / 524288.0)
         return max(0.0, min(100.0, humidity))
 
 
