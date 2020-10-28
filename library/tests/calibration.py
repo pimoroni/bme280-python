@@ -19,3 +19,10 @@ class BME280Calibration(bme280.BME280Calibration):
         self.dig_p7 = 15500
         self.dig_p8 = -14600
         self.dig_p9 = 6000
+
+        self.dig_h1 = 75
+        self.dig_h2 = 376
+        self.dig_h3 = 0
+        self.dig_h4 = 286
+        self.dig_h5 = 50
+        self.dig_h6 = 30
