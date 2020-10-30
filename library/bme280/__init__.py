@@ -5,7 +5,7 @@ import struct
 import time
 
 
-__version__ = '0.0.2'
+__version__ = '0.1.0'
 
 CHIP_ID = 0x60
 I2C_ADDRESS_GND = 0x76

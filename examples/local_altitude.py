@@ -8,7 +8,7 @@ except ImportError:
     from smbus import SMBus
 from bme280 import BME280
 
-print("""local_altitude.py - 
+print("""local_altitude.py -
 Allows you to correct the QNH for your local area.
 Do not rely on this approximation for landing planes.
 Press Ctrl+C to exit!
@@ -19,7 +19,7 @@ bus = SMBus(1)
 bme280 = BME280(i2c_dev=bus)
 
 # asks the user for their local QNH value and confirms it
-local_qnh = input("""Please enter your local QNH value. 
+local_qnh = input("""Please enter your local QNH value.
 You can find this by searching for a local METAR on the internet.
 >""")
 print("You have told us the QNH is", local_qnh)

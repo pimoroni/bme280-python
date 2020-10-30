@@ -2,6 +2,7 @@
 -----
 
 * Switch to setup.cfg
+* Match humidity compensation to BOSCH formula
 
 0.0.2
 -----
