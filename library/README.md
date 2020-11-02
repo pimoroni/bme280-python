@@ -30,6 +30,11 @@ Latest/development library from GitHub:
 
 # Changelog
 
+0.1.1
+-----
+
+* Fix so package is included in .whl releases
+
 0.1.0
 -----
 
