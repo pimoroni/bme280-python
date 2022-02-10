@@ -25,6 +25,7 @@ bme280 = BME280(i2c_dev=bus)
 def get_cpu_temperature():
     process = Popen(['vcgencmd', 'measure_temp'], stdout=PIPE)
     output, _error = process.communicate()
+    output = output.decode()
     return float(output[output.index('=') + 1:output.rindex("'")])
 
 factor = 0.6  # Smaller numbers adjust temp down, vice versa
