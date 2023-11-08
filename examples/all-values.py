@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import time
+
 try:
     from smbus2 import SMBus
 except ImportError:
     from smbus import SMBus
+
 from bme280 import BME280
 
 print("""all-values.py - Read temperature, pressure, and humidity

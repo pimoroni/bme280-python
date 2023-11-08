@@ -10,9 +10,10 @@ TEST_HUM_CMP = 68.66996648709039
 
 
 def test_temperature():
-    from tools import SMBusFakeDevice
-    from bme280 import BME280
     from calibration import BME280Calibration
+    from tools import SMBusFakeDevice
+
+    from bme280 import BME280
     dev = SMBusFakeDevice(1)
 
     # Load the fake temperature into the virtual registers
@@ -30,9 +31,10 @@ def test_temperature():
 
 
 def test_temperature_forced():
-    from tools import SMBusFakeDevice
-    from bme280 import BME280
     from calibration import BME280Calibration
+    from tools import SMBusFakeDevice
+
+    from bme280 import BME280
     dev = SMBusFakeDevice(1)
 
     # Load the fake temperature into the virtual registers
@@ -50,9 +52,10 @@ def test_temperature_forced():
 
 
 def test_pressure():
-    from tools import SMBusFakeDevice
-    from bme280 import BME280
     from calibration import BME280Calibration
+    from tools import SMBusFakeDevice
+
+    from bme280 import BME280
     dev = SMBusFakeDevice(1)
 
     # Load the fake temperature values into the virtual registers
@@ -76,9 +79,10 @@ def test_pressure():
 
 
 def test_altitude():
-    from tools import SMBusFakeDevice
-    from bme280 import BME280
     from calibration import BME280Calibration
+    from tools import SMBusFakeDevice
+
+    from bme280 import BME280
     dev = SMBusFakeDevice(1)
 
     # Load the fake temperature values into the virtual registers
@@ -102,9 +106,10 @@ def test_altitude():
 
 
 def test_humidity():
-    from tools import SMBusFakeDevice
-    from bme280 import BME280
     from calibration import BME280Calibration
+    from tools import SMBusFakeDevice
+
+    from bme280 import BME280
     dev = SMBusFakeDevice(1)
 
     # Load the fake temperature values into the virtual registers

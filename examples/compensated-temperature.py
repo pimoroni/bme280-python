@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import time
-from bme280 import BME280
 from subprocess import PIPE, Popen
+
+from bme280 import BME280
 
 try:
     from smbus2 import SMBus
