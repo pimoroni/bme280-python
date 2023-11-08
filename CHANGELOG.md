@@ -1,3 +1,9 @@
+1.0.0
+-----
+
+* Repackage to pyproject.toml
+* Require i2cdevice>=1.0.0 (smbus2)
+
 0.1.1
 -----
 
