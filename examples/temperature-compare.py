@@ -9,12 +9,14 @@ except ImportError:
 
 from bme280 import BME280
 
-print("""temperature-compare.py - Compares oversampling levels
+print(
+    """temperature-compare.py - Compares oversampling levels
 (requires two BME280s with different addresses).
 
 Press Ctrl+C to exit!
 
-""")
+"""
+)
 
 # Initialise the BME280
 bus = SMBus(1)
@@ -31,5 +33,5 @@ bme280B.setup(mode="normal", temperature_oversampling=16, pressure_oversampling=
 while True:
     temperatureA = bme280A.get_temperature()
     temperatureB = bme280B.get_temperature()
-    print('Forced: {:05.2f}*C Normal: {:05.2f}*C D: {:05.2f}'.format(temperatureA, temperatureB, abs(temperatureA - temperatureB)))
+    print("Forced: {:05.2f}*C Normal: {:05.2f}*C D: {:05.2f}".format(temperatureA, temperatureB, abs(temperatureA - temperatureB)))
     time.sleep(1)

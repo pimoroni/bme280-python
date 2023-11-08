@@ -3,6 +3,7 @@ import bme280
 
 class BME280Calibration(bme280.BME280Calibration):
     """Prefil the calibration class with known values."""
+
     def __init__(self):
         bme280.BME280Calibration.__init__(self)
 

@@ -8,11 +8,13 @@ except ImportError:
     from smbus import SMBus
 from bme280 import BME280
 
-print("""relative-altitude.py - Calculates relative altitude from pressure.
+print(
+    """relative-altitude.py - Calculates relative altitude from pressure.
 
 Press Ctrl+C to exit!
 
-""")
+"""
+)
 
 # Initialise the BME280
 bus = SMBus(1)
@@ -34,5 +36,5 @@ baseline = sum(baseline_values[:-25]) / len(baseline_values[:-25])
 
 while True:
     altitude = bme280.get_altitude(qnh=baseline)
-    print('Relative altitude: {:05.2f} metres'.format(altitude))
+    print("Relative altitude: {:05.2f} metres".format(altitude))
     time.sleep(1)
