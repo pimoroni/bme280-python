@@ -1,37 +1,21 @@
-import sys
-
-import mock
 import pytest
 
 
-def test_setup_not_present():
-    sys.modules["smbus"] = mock.MagicMock()
-    from bme280 import BME280
+def test_setup_not_present(smbus2_mock, bme280):
+    dev = smbus2_mock.SMBus(1)
+    dev.regs[0xD0] = 0x00  # Incorrect chip ID
 
-    bme280 = BME280()
+    sensor = bme280.BME280(i2c_dev=dev)
     with pytest.raises(RuntimeError):
-        bme280.setup()
+        sensor.setup()
 
 
-def test_setup_mock_present():
-    from tools import SMBusFakeDevice
-
-    smbus = mock.Mock()
-    smbus.SMBus = SMBusFakeDevice
-    sys.modules["smbus"] = smbus
-    from bme280 import BME280
-
-    bme280 = BME280()
-    bme280.setup()
+def test_setup_mock_present(smbus2_mock, bme280):
+    sensor = bme280.BME280()
+    sensor.setup()
 
 
-def test_setup_forced_mode():
-    from tools import SMBusFakeDevice
+def test_setup_forced_mode(smbus2_mock, bme280):
 
-    smbus = mock.Mock()
-    smbus.SMBus = SMBusFakeDevice
-    sys.modules["smbus"] = smbus
-    from bme280 import BME280
-
-    bme280 = BME280()
-    bme280.setup(mode="forced")
+    sensor = bme280.BME280()
+    sensor.setup(mode="forced")
