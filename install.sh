@@ -1,5 +1,6 @@
 #!/bin/bash
 LIBRARY_NAME=`grep -m 1 name pyproject.toml | awk -F" = " '{print substr($2,2,length($2)-2)}'`
+MODULE_NAME="bme280"
 CONFIG=/boot/config.txt
 DATESTAMP=`date "+%Y-%m-%d-%H-%M-%S"`
 CONFIG_BACKUP=false
@@ -280,7 +281,7 @@ printf "\n"
 if confirm "Would you like to generate documentation?"; then
 	pip_pkg_install pdoc
 	printf "Generating documentation.\n"
-	$PYTHON -m pdoc $LIBRARY_NAME -o $RESOURCES_DIR/docs > /dev/null
+	$PYTHON -m pdoc $MODULE_NAME -o $RESOURCES_DIR/docs > /dev/null
 	if [ $? -eq 0 ]; then
 		inform "Documentation saved to $RESOURCES_DIR/docs"
 		success "Done!"
