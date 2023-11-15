@@ -2,10 +2,7 @@
 
 import time
 
-try:
-    from smbus2 import SMBus
-except ImportError:
-    from smbus import SMBus
+from smbus2 import SMBus
 
 from bme280 import BME280
 
@@ -21,5 +18,5 @@ bme280.setup(mode="forced")
 
 while True:
     temperature = bme280.get_temperature()
-    print("{:05.2f}*C".format(temperature))
+    print(f"{temperature:05.2f}°C")
     time.sleep(1)

@@ -2,10 +2,8 @@
 
 import time
 
-try:
-    from smbus2 import SMBus
-except ImportError:
-    from smbus import SMBus
+from smbus2 import SMBus
+
 from bme280 import BME280
 
 print(
@@ -22,10 +20,20 @@ bme280 = BME280(i2c_dev=bus)
 
 # asks the user for their local QNH value and confirms it
 local_qnh = input(
-    """Please enter your local QNH value.
-You can find this by searching for a local METAR on the internet.
+    """Please enter your local QNH value (air pressure at the mean sea level).
+
+You can find this by searching for a local METAR report,
+    eg: "Cambridge METAR"
+
+And looking for the number prefixed with a "Q",
+    eg: Q1015
 >"""
 )
+
+# remove a Q prefix if there is one
+if local_qnh.startswith("Q") or local_qnh.startswith("q"):
+    local_qnh = local_qnh[1:]
+
 print("You have told us the QNH is", local_qnh)
 
 # converts the input into a floating point number
@@ -39,5 +47,5 @@ time.sleep(2)
 
 while True:
     altitude = bme280.get_altitude(qnh=local_qnh)
-    print(round(altitude), "metres above sea level")
+    print(f"{altitude:0.0f} metres above sea level")
     time.sleep(2)
