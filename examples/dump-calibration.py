@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-try:
-    from smbus2 import SMBus
-except ImportError:
-    from smbus import SMBus
+
+from smbus2 import SMBus
+
 from bme280 import BME280
 
 print(
@@ -21,4 +20,4 @@ bme280.setup()
 for key in dir(bme280.calibration):
     if key.startswith("dig_"):
         value = getattr(bme280.calibration, key)
-        print("{} = {}".format(key, value))
+        print(f"{key} = {value}")

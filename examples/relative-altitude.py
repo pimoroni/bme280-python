@@ -2,10 +2,8 @@
 
 import time
 
-try:
-    from smbus2 import SMBus
-except ImportError:
-    from smbus import SMBus
+from smbus2 import SMBus
+
 from bme280 import BME280
 
 print(
@@ -23,7 +21,7 @@ bme280 = BME280(i2c_dev=bus)
 baseline_values = []
 baseline_size = 100
 
-print("Collecting baseline values for {:d} seconds. Do not move the sensor!\n".format(baseline_size))
+print(f"Collecting baseline values for {baseline_size:d} seconds. Do not move the sensor!\n")
 
 # Collect some values to calculate a baseline pressure
 for i in range(baseline_size):
@@ -36,5 +34,5 @@ baseline = sum(baseline_values[:-25]) / len(baseline_values[:-25])
 
 while True:
     altitude = bme280.get_altitude(qnh=baseline)
-    print("Relative altitude: {:05.2f} metres".format(altitude))
+    print(f"Relative altitude: {altitude:05.2f} metres")
     time.sleep(1)

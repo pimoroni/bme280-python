@@ -3,12 +3,9 @@
 import time
 from subprocess import PIPE, Popen
 
-from bme280 import BME280
+from smbus2 import SMBus
 
-try:
-    from smbus2 import SMBus
-except ImportError:
-    from smbus import SMBus
+from bme280 import BME280
 
 print(
     """compensated-temperature.py - Use the CPU temperature to compensate temperature
@@ -49,6 +46,6 @@ while True:
     raw_temp = bme280.get_temperature()
     comp_temp = raw_temp - ((smoothed_cpu_temp - raw_temp) / factor)
 
-    print("Compensated temperature: {:05.2f} *C".format(comp_temp))
+    print(f"Raw: {raw_temp:05.2f}°C, Compensated: {comp_temp:05.2f}°C")
 
     time.sleep(1.0)
