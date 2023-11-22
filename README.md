@@ -1,7 +1,7 @@
 # BME280 Temperature, Pressure, & Humidity Sensor
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/pimoroni/bme280-python/test.yml?branch=main)](https://github.com/pimoroni/bme280-python/actions/workflows/test.yml)
-[![Coverage Status](https://coveralls.io/repos/github/pimoroni/bme280-python/badge.svg?branch=master)](https://coveralls.io/github/pimoroni/bme280-python?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/pimoroni/bme280-python/badge.svg?branch=main)](https://coveralls.io/github/pimoroni/bme280-python?branch=main)
 [![PyPi Package](https://img.shields.io/pypi/v/pimoroni-bme280.svg)](https://pypi.python.org/pypi/pimoroni-bme280)
 [![Python Versions](https://img.shields.io/pypi/pyversions/pimoroni-bme280.svg)](https://pypi.python.org/pypi/pimoroni-bme280)
 
