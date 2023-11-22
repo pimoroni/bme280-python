@@ -7,7 +7,7 @@ DATESTAMP=`date "+%Y-%m-%d-%H-%M-%S"`
 CONFIG_BACKUP=false
 APT_HAS_UPDATED=false
 RESOURCES_TOP_DIR=$HOME/Pimoroni
-VENV_BASH_SNIPPET=$RESOURCES_DIR/auto_venv.sh
+VENV_BASH_SNIPPET=$RESOURCES_TOP_DIR/auto_venv.sh
 VENV_DIR=$HOME/.virtualenvs/pimoroni
 WD=`pwd`
 USAGE="./install.sh (--unstable)"
@@ -65,19 +65,21 @@ find_config() {
 			warning "Could not find $CONFIG_FILE!"
 			exit 1
 		fi
-    else
-        if [ -f "/boot/$CONFIG_FILE" ] && [ ! -L "/boot/$CONFIG_FILE" ]; then
-            warning "Oops! It looks like /boot/$CONFIG_FILE is not a link to $CONFIG_DIR/$CONFIG_FILE"
-            warning "You might want to fix this!"
-        fi
+	else
+		if [ -f "/boot/$CONFIG_FILE" ] && [ ! -L "/boot/$CONFIG_FILE" ]; then
+			warning "Oops! It looks like /boot/$CONFIG_FILE is not a link to $CONFIG_DIR/$CONFIG_FILE"
+			warning "You might want to fix this!"
+		fi
 	fi
-    inform "Using $CONFIG_FILE in $CONFIG_DIR"
+	inform "Using $CONFIG_FILE in $CONFIG_DIR"
 }
 
 venv_bash_snippet() {
+	inform "Checking for $VENV_BASH_SNIPPET\n"
 	if [ ! -f $VENV_BASH_SNIPPET ]; then
+		inform "Creating $VENV_BASH_SNIPPET\n"
 		cat << EOF > $VENV_BASH_SNIPPET
-# Add `source $RESOURCES_DIR/auto_venv.sh` to your ~/.bashrc to activate
+# Add "source $VENV_BASH_SNIPPET" to your ~/.bashrc to activate
 # the Pimoroni virtual environment automagically!
 VENV_DIR="$VENV_DIR"
 if [ ! -f \$VENV_DIR/bin/activate ]; then
