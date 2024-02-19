@@ -1,6 +1,6 @@
 #!/bin/bash
 LIBRARY_NAME=$(grep -m 1 name pyproject.toml | awk -F" = " '{print substr($2,2,length($2)-2)}')
-MODULE_NAME="grow"
+MODULE_NAME="bme280"
 CONFIG_FILE=config.txt
 CONFIG_DIR="/boot/firmware"
 DATESTAMP=$(date "+%Y-%m-%d-%H-%M-%S")
