@@ -22,7 +22,7 @@ In the new terminal window type the commands exactly as it appears below (check 
 
 ```bash
 git clone https://github.com/pimoroni/bme280-python
-cd lsm6ds3-python
+cd bme280-python
 ./install.sh
 ```
 
