@@ -38,7 +38,7 @@ If you want to contribute, or like living on the edge of your seat by having the
 
 ```bash
 git clone https://github.com/pimoroni/bme280-python
-cd lsm6ds3-python
+cd bme280-python
 ./install.sh --unstable
 ```
 
