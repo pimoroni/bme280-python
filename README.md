@@ -55,4 +55,3 @@ This will not make any configuration changes, so you may also need to enable:
 * i2c: `sudo raspi-config nonint do_i2c 0`
 
 You can optionally run `sudo raspi-config` or the graphical Raspberry Pi Configuration UI to enable interfaces.
-
