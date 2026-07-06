@@ -1,6 +1,5 @@
 #!/bin/bash
 LIBRARY_NAME=$(grep -m 1 name pyproject.toml | awk -F" = " '{print substr($2,2,length($2)-2)}')
-MODULE_NAME="bme280"
 CONFIG_FILE=config.txt
 CONFIG_DIR="/boot/firmware"
 DATESTAMP=$(date "+%Y-%m-%d-%H-%M-%S")
@@ -164,6 +163,12 @@ function apt_pkg_install {
 function pip_pkg_install {
 	# A null Keyring prevents pip stalling in the background
 	PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring $PYTHON -m pip install --upgrade "$@"
+	check_for_error
+}
+
+function pip_requirements_install {
+	# A null Keyring prevents pip stalling in the background
+	PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring $PYTHON -m pip install -r "$@"
 	check_for_error
 }
 
@@ -336,13 +341,22 @@ fi
 
 printf "\n"
 
+if [ -f "requirements-examples.txt" ]; then
+	if confirm "Would you like to install example dependencies?"; then
+		inform "Installing dependencies from requirements-examples.txt..."
+		pip_requirements_install requirements-examples.txt
+	fi
+fi
+
+printf "\n"
+
 # Use pdoc to generate basic documentation from the installed module
 
 if confirm "Would you like to generate documentation?"; then
 	inform "Installing pdoc. Please wait..."
 	pip_pkg_install pdoc
 	inform "Generating documentation.\n"
-	if $PYTHON -m pdoc "$MODULE_NAME" -o "$RESOURCES_DIR/docs" > /dev/null; then
+	if $PYTHON -m pdoc "$LIBRARY_NAME" -o "$RESOURCES_DIR/docs" > /dev/null; then
 		inform "Documentation saved to $RESOURCES_DIR/docs"
 		success "Done!"
 	else
