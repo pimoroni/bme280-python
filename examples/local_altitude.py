@@ -31,7 +31,7 @@ And looking for the number prefixed with a "Q",
 )
 
 # remove a Q prefix if there is one
-if local_qnh.startswith("Q") or local_qnh.startswith("q"):
+if local_qnh.startswith(("Q", "q")):
     local_qnh = local_qnh[1:]
 
 print("You have told us the QNH is", local_qnh)

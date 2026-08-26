@@ -24,7 +24,7 @@ baseline_size = 100
 print(f"Collecting baseline values for {baseline_size:d} seconds. Do not move the sensor!\n")
 
 # Collect some values to calculate a baseline pressure
-for i in range(baseline_size):
+for _i in range(baseline_size):
     pressure = bme280.get_pressure()
     baseline_values.append(pressure)
     time.sleep(1)

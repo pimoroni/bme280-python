@@ -1,4 +1,5 @@
 """BME280 Driver."""
+import contextlib
 import struct
 import time
 
@@ -81,11 +82,9 @@ class BME280Calibration:
     def set_from_namedtuple(self, value):
         # Iterate through a tuple supplied by i2cdevice
         # and copy its values into the class attributes
-        for key in self.__dict__.keys():
-            try:
+        for key in self.__dict__:
+            with contextlib.suppress(AttributeError):
                 setattr(self, key, getattr(value, key))
-            except AttributeError:
-                pass
 
     def compensate_temperature(self, raw_temperature):
         var1 = (raw_temperature / 16384.0 - self.dig_t1 / 1024.0) * self.dig_t2
@@ -214,9 +213,9 @@ class BME280:
         try:
             chip = self._bme280.get("CHIP_ID")
             if chip.id != CHIP_ID:
-                raise RuntimeError("Unable to find bme280 on 0x{:02x}, CHIP_ID returned {:02x}".format(self._i2c_addr, chip.id))
-        except IOError:
-            raise RuntimeError("Unable to find bme280 on 0x{:02x}, IOError".format(self._i2c_addr))
+                raise RuntimeError(f"Unable to find bme280 on 0x{self._i2c_addr:02x}, CHIP_ID returned {chip.id:02x}")
+        except OSError:
+            raise RuntimeError(f"Unable to find bme280 on 0x{self._i2c_addr:02x}, IOError") from None
 
         self._bme280.set("RESET", reset=0xB6)
         time.sleep(0.1)
