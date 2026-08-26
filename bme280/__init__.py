@@ -41,7 +41,7 @@ class H5Adapter(S16Adapter):
         b = _int_to_bytes(value, 2)
         r = ((b[0] >> 4) & 0x0F) | (b[1] << 4)
         if r & (1 << 11):
-            r = r - 1 << 12
+            r = r - (1 << 12)
         return r
 
 
@@ -50,7 +50,7 @@ class H4Adapter(S16Adapter):
         b = _int_to_bytes(value, 2)
         r = (b[0] << 4) | (b[1] & 0x0F)
         if r & (1 << 11):
-            r = r - 1 << 12
+            r = r - (1 << 12)
         return r
 
 
@@ -206,6 +206,9 @@ class BME280:
 
         self._bme280.select_address(self._i2c_addr)
         self._mode = mode
+        self._temperature_oversampling = temperature_oversampling
+        self._pressure_oversampling = pressure_oversampling
+        self._humidity_oversampling = humidity_oversampling
 
         if mode == "forced":
             mode = "sleep"
@@ -229,12 +232,26 @@ class BME280:
         self.calibration.set_from_namedtuple(self._bme280.get("CALIBRATION"))
         self.calibration.set_from_namedtuple(self._bme280.get("CALIBRATION2"))
 
+        # In normal mode the first conversion is still in flight, and DATA holds reset values.
+        if self._mode == "normal":
+            time.sleep(self._measurement_time_ms() / 1000.0)
+
+    def _measurement_time_ms(self):
+        """Worst-case measurement time for the configured oversampling, per the datasheet."""
+        return (1.25
+                + (2.3 * self._temperature_oversampling)
+                + (2.3 * self._pressure_oversampling) + 0.575
+                + (2.3 * self._humidity_oversampling) + 0.575)
+
     def update_sensor(self):
         self.setup()
 
         if self._mode == "forced":
             self._bme280.set("CTRL_MEAS", mode="forced")
+            timeout = time.time() + (self._measurement_time_ms() * 4) / 1000.0
             while self._bme280.get("STATUS").measuring:
+                if time.time() > timeout:
+                    raise RuntimeError("Timed out waiting for BME280 measurement to complete")
                 time.sleep(0.001)
 
         raw = self._bme280.get("DATA")
@@ -257,6 +274,5 @@ class BME280:
 
     def get_altitude(self, qnh=1013.25):
         self.update_sensor()
-        pressure = self.get_pressure()
-        altitude = 44330.0 * (1.0 - pow(pressure / qnh, (1.0 / 5.255)))
+        altitude = 44330.0 * (1.0 - pow(self.pressure / qnh, (1.0 / 5.255)))
         return altitude

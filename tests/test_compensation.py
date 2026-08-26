@@ -119,3 +119,59 @@ def test_humidity(smbus2_mock, bme280):
     sensor.calibration = BME280Calibration()
 
     assert round(sensor.get_humidity(), 4) == round(TEST_HUM_CMP, 4)
+
+
+def test_h4_h5_adapters_are_12_bit_signed(bme280):
+    # dig_h4 is 0xE4 << 4 | 0xE5[3:0], dig_h5 is 0xE6 << 4 | 0xE5[7:4]
+    assert bme280.H4Adapter()._decode(0x8000) == -2048
+    assert bme280.H5Adapter()._decode(0x0080) == -2048
+
+    assert bme280.H4Adapter()._decode(0xFFFF) == -1
+    assert bme280.H5Adapter()._decode(0xFFFF) == -1
+
+    assert bme280.H4Adapter()._decode(0x0000) == 0
+    assert bme280.H5Adapter()._decode(0x0000) == 0
+
+    assert bme280.H4Adapter()._decode(0x110E) == 286
+    assert bme280.H5Adapter()._decode(0x2003) == 50
+
+
+def test_forced_mode_times_out(smbus2_mock, bme280):
+    import pytest
+
+    dev = smbus2_mock.SMBus(1)
+
+    sensor = bme280.BME280(i2c_dev=dev)
+    sensor.setup(mode="forced")
+
+    # Leave the measuring bit set so the conversion never appears to complete
+    dev.regs[0xF3] = 0b00001000
+
+    with pytest.raises(RuntimeError):
+        sensor.update_sensor()
+
+
+def test_altitude_takes_one_measurement(smbus2_mock, bme280):
+    from calibration import BME280Calibration
+
+    dev = smbus2_mock.SMBus(1)
+
+    dev.regs[0xF9] = (TEST_PRES_RAW & 0x0000F) << 4
+    dev.regs[0xF8] = (TEST_PRES_RAW & 0x00FF0) >> 4
+    dev.regs[0xF7] = (TEST_PRES_RAW & 0xFF000) >> 12
+
+    sensor = bme280.BME280(i2c_dev=dev)
+    sensor.setup()
+    sensor.calibration = BME280Calibration()
+
+    original = sensor.update_sensor
+    calls = []
+
+    def counted():
+        calls.append(1)
+        return original()
+
+    sensor.update_sensor = counted
+    sensor.get_altitude()
+
+    assert len(calls) == 1
