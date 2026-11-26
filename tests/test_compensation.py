@@ -1,3 +1,7 @@
+from unittest.mock import Mock
+
+import pytest
+
 TEST_TEMP_RAW = 529191
 TEST_TEMP_CMP = 24.7894877676
 
@@ -72,7 +76,8 @@ def test_pressure(smbus2_mock, bme280):
     assert round(sensor.get_pressure(), 4) == round(TEST_PRES_CMP, 4)
 
 
-def test_altitude(smbus2_mock, bme280):
+@pytest.mark.parametrize("mode", ["normal", "forced"])
+def test_altitude(smbus2_mock, bme280, mode):
     from calibration import BME280Calibration
 
     dev = smbus2_mock.SMBus(1)
@@ -89,12 +94,19 @@ def test_altitude(smbus2_mock, bme280):
     dev.regs[0xF7] = (TEST_PRES_RAW & 0xFF000) >> 12
 
     sensor = bme280.BME280(i2c_dev=dev)
-    sensor.setup()
+    sensor.setup(mode=mode)
 
     # Replace the loaded calibration with our known values
     sensor.calibration = BME280Calibration()
 
+    dev.read_i2c_block_data = Mock(wraps=dev.read_i2c_block_data)
+    dev.write_i2c_block_data = Mock(wraps=dev.write_i2c_block_data)
+
     assert round(sensor.get_altitude(), 4) == round(TEST_ALT_CMP, 4)
+    data_reads = [call for call in dev.read_i2c_block_data.call_args_list if call.args[1] == 0xF7]
+    assert len(data_reads) == 1
+    measurement_writes = [call for call in dev.write_i2c_block_data.call_args_list if call.args[1] == 0xF4]
+    assert len(measurement_writes) == (1 if mode == "forced" else 0)
 
 
 def test_humidity(smbus2_mock, bme280):
