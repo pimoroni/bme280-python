@@ -230,6 +230,12 @@ class BME280:
         self.calibration.set_from_namedtuple(self._bme280.get("CALIBRATION"))
         self.calibration.set_from_namedtuple(self._bme280.get("CALIBRATION2"))
 
+        if mode == "normal":
+            # Wait for the first sample instead of reading the reset values.
+            # Maximum measurement time in ms, from datasheet section 9.1.
+            measurement_time = 1.25 + 2.3 * (temperature_oversampling + pressure_oversampling + humidity_oversampling) + 2 * 0.575
+            time.sleep(measurement_time / 1000.0)
+
     def update_sensor(self):
         self.setup()
 
